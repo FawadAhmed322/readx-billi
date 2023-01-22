@@ -109,7 +109,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       ),
                       SizedBox(height: spacer),
                       MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          
+                        },
                         minWidth: double.infinity,
                         height: 50,
                         shape: RoundedRectangleBorder(

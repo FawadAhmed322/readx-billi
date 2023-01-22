@@ -332,7 +332,14 @@ class CardRecent extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => DetailScreen(trend: book)),
+          );
+        },
+        child: Row(
         children: [
           Container(
               child: new ImageNetwork(
@@ -375,6 +382,7 @@ class CardRecent extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
