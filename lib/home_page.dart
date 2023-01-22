@@ -310,8 +310,6 @@ class CardRecent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("gs://bookapp-3f431.appspot.com/book_covers" + book.image.toString());
-    print("lol");
 
     return Container(
       width: 228,

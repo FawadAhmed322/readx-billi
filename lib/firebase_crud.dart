@@ -68,8 +68,32 @@ class FirebaseCrud {
 
   Future<List<BookModel>> getAllBooks() async {
     final books = (await _dbBooks.get()).value;
+
+    final List<BookModel> bookModels = [];
+
+    final databaseReference = FirebaseDatabase.instance.ref("readx").child("books");
+    databaseReference.onValue.listen((DatabaseEvent event) {
+      final books = event.snapshot.children;
+      books.forEach((user) {
+        user.children.forEach((book) {
+          BookModel tempBookModel = new BookModel();
+
+          tempBookModel.id = book.child('id').value as int;
+          tempBookModel.name = book.child("name").value as String;
+          tempBookModel.writer = book.child("writer").value as String;
+          tempBookModel.image = book.child("image").value as String;
+          tempBookModel.filename = book.child("filename").value as String;
+
+          bookModels.add(tempBookModel);
+        });
+      });
+    });
+
+    return bookModels;
+
     if (books is Map) {
       try {
+
         return books.keys
             .toList()
             .map((e) => BookModel.fromJson(books['$e']))

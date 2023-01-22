@@ -33,94 +33,102 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future getAllBooks() async {
-    books.addAll(await getIt<FirebaseCrud>().getAllBooks());
-    for (int i = 0; i < books.length; i++) {
-      categories.addAll(books[i].genre ?? []);
-    }
-    categories.removeWhere((element) => element == '');
-    categories = categories.toSet().toList();
+    // books.addAll(await getIt<FirebaseCrud>().getAllBooks());
+
+    books = await getIt<FirebaseCrud>().getAllBooks();
+
+    print(books);
+    books.forEach((book) {
+      print(book.name);
+      print('xddd');
+    });
+    // for (int i = 0; i < books.length; i++) {
+    //   // categories.addAll(books[i].genre ?? []);
+    // }
+    // categories.removeWhere((element) => element == '');
+    // categories = categories.toSet().toList();
     setState(() {});
   }
 
-  addDummyData() async {
-    await getIt<FirebaseCrud>().addUser(
-      UserModel(
-        id: 101,
-        name: 'Talha',
-        image: 'https://statinfer.com/wp-content/uploads/dummy-user.png',
-      ),
-    );
-
-    await getIt<FirebaseCrud>().addUser(
-      UserModel(
-        id: 102,
-        name: 'Ammar',
-        image: 'https://avatars.githubusercontent.com/u/40992581?v=4',
-      ),
-    );
-
-    await getIt<FirebaseCrud>().addUser(
-      UserModel(
-        id: 103,
-        name: 'Muneeb',
-        image:
-            'https://enphamedbiotech.com/wp-content/uploads/2021/02/article_51_7-18-20181-15-10PM.jpg',
-      ),
-    );
-
-    await getIt<FirebaseCrud>().addBook(
-      BookModel(
-          id: 2002,
-          name: 'Rings',
-          writer: 'J.R.R Tolkien',
-          genre: [
-            'fiction',
-            'fantasy',
-            'adventure',
-            'romance',
-          ],
-          isTrending: true,
-          price: 350,
-          rating: 4.2,
-          image:
-              'https://orion-uploads.openroadmedia.com/sm_f7e651-tolkien-lordoftherings.jpg'),
-    );
-
-    await getIt<FirebaseCrud>().addBook(
-      BookModel(
-        id: 2003,
-        name: 'Pinocchio',
-        writer: 'Carlo Collodi',
-        genre: [
-          'fantasy',
-          'animation',
-        ],
-        isTrending: true,
-        price: 380,
-        rating: 3.8,
-        image: 'https://book-assets.openroadmedia.com/9781497679276.jpg',
-      ),
-    );
-
-    await getIt<FirebaseCrud>().addBook(
-      BookModel(
-        id: 2004,
-        name: 'The Da Vinci Code',
-        writer: 'Dan Brown',
-        genre: [
-          'thriller',
-          'mystery',
-          'crime',
-          'conspiracy',
-        ],
-        isTrending: true,
-        price: 680,
-        rating: 4.3,
-        image:
-            'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTKbOIl7MrHrrt4MxSxbQ7Ml9UlQ8CnoGcT0aHX2fEAEwJWn7Mz',
-      ),
-    );
-  }
+  // addDummyData() async {
+  //   await getIt<FirebaseCrud>().addUser(
+  //     UserModel(
+  //       id: 101,
+  //       name: 'Talha',
+  //       image: 'https://statinfer.com/wp-content/uploads/dummy-user.png',
+  //     ),
+  //   );
+  //
+  //   await getIt<FirebaseCrud>().addUser(
+  //     UserModel(
+  //       id: 102,
+  //       name: 'Ammar',
+  //       image: 'https://avatars.githubusercontent.com/u/40992581?v=4',
+  //     ),
+  //   );
+  //
+  //   await getIt<FirebaseCrud>().addUser(
+  //     UserModel(
+  //       id: 103,
+  //       name: 'Muneeb',
+  //       image:
+  //           'https://enphamedbiotech.com/wp-content/uploads/2021/02/article_51_7-18-20181-15-10PM.jpg',
+  //     ),
+  //   );
+  //
+  //   await getIt<FirebaseCrud>().addBook(
+  //     BookModel(
+  //         id: 2002,
+  //         name: 'Rings',
+  //         writer: 'J.R.R Tolkien',
+  //         genre: [
+  //           'fiction',
+  //           'fantasy',
+  //           'adventure',
+  //           'romance',
+  //         ],
+  //         isTrending: true,
+  //         price: 350,
+  //         rating: 4.2,
+  //         image:
+  //             'https://orion-uploads.openroadmedia.com/sm_f7e651-tolkien-lordoftherings.jpg'),
+  //   );
+  //
+  //   await getIt<FirebaseCrud>().addBook(
+  //     BookModel(
+  //       id: 2003,
+  //       name: 'Pinocchio',
+  //       writer: 'Carlo Collodi',
+  //       genre: [
+  //         'fantasy',
+  //         'animation',
+  //       ],
+  //       isTrending: true,
+  //       price: 380,
+  //       rating: 3.8,
+  //       image: 'https://book-assets.openroadmedia.com/9781497679276.jpg',
+  //     ),
+  //   );
+  //
+  //   await getIt<FirebaseCrud>().addBook(
+  //     BookModel(
+  //       id: 2004,
+  //       name: 'The Da Vinci Code',
+  //       writer: 'Dan Brown',
+  //       genre: [
+  //         'thriller',
+  //         'mystery',
+  //         'crime',
+  //         'conspiracy',
+  //       ],
+  //       isTrending: true,
+  //       price: 680,
+  //       rating: 4.3,
+  //       image:
+  //           'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTKbOIl7MrHrrt4MxSxbQ7Ml9UlQ8CnoGcT0aHX2fEAEwJWn7Mz',
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +141,7 @@ class _DashboardPageState extends State<DashboardPage> {
             // NOTE: header
             Header(
                 books: books
-                    .where((element) => element.isTrending == false)
+                    // .where((element) => element.isTrending == false)
                     .toList()),
             SizedBox(height: spacer),
             CategoryList(categories: categories),
@@ -142,10 +150,10 @@ class _DashboardPageState extends State<DashboardPage> {
               title: "Trending Now",
               backgroundColor: backgroundColor2,
             ),
-            TrendingList(
-              trendingBooks:
-                  books.where((element) => element.isTrending == true).toList(),
-            )
+            // TrendingList(
+            //   trendingBooks:
+            //       books.where((element) => element.isTrending == true).toList(),
+            // )
           ],
         ),
       ),

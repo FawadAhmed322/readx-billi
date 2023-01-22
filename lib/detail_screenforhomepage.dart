@@ -91,7 +91,8 @@ class _DetailScreenState extends State<DetailScreen> {
                           children: [
                             SectionDetail(
                               title: 'Rating',
-                              value: '${widget.trend.rating}',
+                              // value: '${widget.trend.rating}',
+                              value: '',
                             ),
                             LineSection(),
                             SectionDetail(
