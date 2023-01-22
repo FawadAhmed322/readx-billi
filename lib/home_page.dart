@@ -417,6 +417,9 @@ class TrendingList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    trendingBooks.shuffle();
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(

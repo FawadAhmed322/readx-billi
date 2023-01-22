@@ -150,10 +150,10 @@ class _DashboardPageState extends State<DashboardPage> {
               title: "Trending Now",
               backgroundColor: backgroundColor2,
             ),
-            // TrendingList(
-            //   trendingBooks:
-            //       books.where((element) => element.isTrending == true).toList(),
-            // )
+            TrendingList(
+              trendingBooks:
+                  books.toList(),
+            )
           ],
         ),
       ),

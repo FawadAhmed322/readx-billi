@@ -84,6 +84,8 @@ class FirebaseCrud {
           tempBookModel.image = book.child("image").value as String;
           tempBookModel.filename = book.child("filename").value as String;
 
+          print(book.child("name").value as String);
+
           bookModels.add(tempBookModel);
         });
       });
