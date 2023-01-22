@@ -6,7 +6,8 @@ class BookModel {
       this.genre, 
       this.isTrending, 
       this.writer, 
-      this.image, 
+      this.image,
+      this.filename,
       this.price,});
 
   BookModel.fromJson(dynamic json) {
@@ -17,6 +18,7 @@ class BookModel {
     isTrending = json['is_trending'];
     writer = json['writer'];
     image = json['image'];
+    filename = json['filename'];
     price = json['price'];
   }
   int? id;
@@ -26,6 +28,7 @@ class BookModel {
   bool? isTrending;
   String? writer;
   String? image;
+  String? filename;
   int? price;
 
   Map<String, dynamic> toJson() {
@@ -37,6 +40,7 @@ class BookModel {
     map['is_trending'] = isTrending;
     map['writer'] = writer;
     map['image'] = image;
+    map['filename'] = filename;
     map['price'] = price;
     return map;
   }

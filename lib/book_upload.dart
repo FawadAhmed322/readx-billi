@@ -11,6 +11,8 @@ import 'package:readx/firebase_crud.dart';
 import 'package:readx/main.dart';
 import 'package:readx/utils/toast_util.dart';
 
+import 'models/Book_model.dart';
+
 class BookUpload extends StatefulWidget {
   const BookUpload({Key? key}) : super(key: key);
 
@@ -24,6 +26,8 @@ class _BookUploadState extends State<BookUpload> {
   bool coverLocallyUploaded = false;
   String? bookPath;
   String? coverPath;
+
+  late BookModel bookModel;
 
   Future<String?> filePicker() async {
     FilePickerResult? result =
@@ -47,24 +51,33 @@ class _BookUploadState extends State<BookUpload> {
 
   Future<Map<String, String>> uploadBook(
       File file, File file2, int userId) async {
+
+    var currentTime = DateTime.now().millisecondsSinceEpoch;
+
     final reference = FirebaseStorage.instance
         .ref('books')
         .child('$userId')
-        .child('${DateTime.now().millisecondsSinceEpoch}');
+        .child(currentTime.toString());
     final coverReference = FirebaseStorage.instance
         .ref('book_covers')
         .child('$userId')
-        .child('${DateTime.now().millisecondsSinceEpoch}');
+        .child(currentTime.toString());
     await reference.putFile(file);
     await coverReference.putFile(file2);
     //waiting for some more milliseconds to upload the file successfully
     await Future.delayed(const Duration(milliseconds: 300));
     String book_url = await reference.getDownloadURL();
     String cover_url = await coverReference.getDownloadURL();
+
+    addBooktoDB(book_url, cover_url, currentTime);
+
     print(book_url);
     print(cover_url);
     return {'book_url': book_url, 'cover_url': cover_url};
   }
+
+  final BookNameController = TextEditingController();
+  final BookWriterController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -78,12 +91,14 @@ class _BookUploadState extends State<BookUpload> {
               SizedBox(height: 50),
               //name, rating, writer, image, is trending
               TextFormField(
+                controller: BookNameController,
                 decoration: InputDecoration(
                   hintText: 'Book Name',
                 ),
               ),
               SizedBox(height: 20),
               TextFormField(
+                controller: BookWriterController,
                 decoration: InputDecoration(
                   hintText: 'Writer Name',
                 ),
@@ -135,5 +150,15 @@ class _BookUploadState extends State<BookUpload> {
         ),
       ),
     );
+  }
+
+  void addBooktoDB(String book_url, String cover_url, int book_id) async {
+    bookModel = new BookModel();
+    bookModel.image = cover_url;
+    bookModel.filename = book_url;
+    bookModel.id = book_id;
+    bookModel.name = BookNameController.text.toString();
+    bookModel.writer = BookWriterController.text.toString();
+    await getIt<FirebaseCrud>().addBookDB(userController.loggedInUser!.id!, bookModel);
   }
 }

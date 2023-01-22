@@ -249,6 +249,11 @@ class FirebaseCrud {
     }
   }
 
+  ///AddBook
+  Future addBookDB(int userid, BookModel bookModel) async {
+    await _dbBooks.child('$userid').child(bookModel.id.toString()).update(bookModel.toJson());
+  }
+
   ///NOTES CRUD
   Future addNote(int userId, NoteModel noteModel) async {
     await _dbNotes
