@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
@@ -20,6 +21,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await _initializeSingletons();
   _initializeControllers();
+  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
   runApp(Myapp());
 }
 
@@ -42,7 +44,7 @@ class Myapp extends StatelessWidget {
           splashTransition: SplashTransition.decoratedBoxTransition,
           splashIconSize: 250,
           duration: 30,
-          animationDuration: Duration(seconds: 1),
+          animationDuration: Duration(seconds: 6),
           nextScreen: LoginScreen(),
         ));
   }

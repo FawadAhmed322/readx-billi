@@ -57,11 +57,11 @@ class _BookUploadState extends State<BookUpload> {
     final reference = FirebaseStorage.instance
         .ref('books')
         .child('$userId')
-        .child(currentTime.toString());
+        .child(currentTime.toString() + '.pdf');
     final coverReference = FirebaseStorage.instance
         .ref('book_covers')
         .child('$userId')
-        .child(currentTime.toString());
+        .child(currentTime.toString() + '.jpg');
     await reference.putFile(file);
     await coverReference.putFile(file2);
     //waiting for some more milliseconds to upload the file successfully

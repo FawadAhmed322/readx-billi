@@ -1,8 +1,15 @@
 
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:readx/home_page.dart';
 import 'package:readx/models/Book_model.dart';
 import 'package:readx/trend.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'mypdfviewer.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 class DetailScreen extends StatefulWidget {
   const DetailScreen({
@@ -17,6 +24,14 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+
+  Future<void> _launchUrl() async {
+    print(Uri.parse(widget.trend.filename.toString()));
+    if (!await launchUrl(Uri.parse(widget.trend.filename.toString()))) {
+      throw Exception('Could not launch');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,8 +124,59 @@ class _DetailScreenState extends State<DetailScreen> {
                       ),
                       SizedBox(height: spacer),
                       MaterialButton(
-                        onPressed: () {
-                          
+                        onPressed: () async {
+
+                          final appDocDir = await getApplicationDocumentsDirectory();
+                          final filePath = "${appDocDir.absolute}/books/${widget.trend.id}.pdf";
+                          final file = File(filePath);
+
+                          print(filePath);
+
+                          final taskId = await FlutterDownloader.enqueue(
+                            url: widget.trend.filename.toString(),
+                            savedDir: filePath,
+                            showNotification: false, // show download progress in status bar (for Android)
+                            openFileFromNotification: false, // click on notification to open downloaded file (for Android)
+                          );
+
+                          print(filePath);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MyPdfViewer(filePath)),
+                          );
+
+                          // print(widget.trend.filename.toString());
+                          //
+                          // final httpsReference = FirebaseStorage.instance.refFromURL(widget.trend.filename.toString());
+                          // final downloadTask = httpsReference.writeToFile(file);
+                          // downloadTask.snapshotEvents.listen((taskSnapshot) {
+                          //   switch (taskSnapshot.state) {
+                          //     case TaskState.running:
+                          //     // TODO: Handle this case.
+                          //       break;
+                          //     case TaskState.paused:
+                          //     // TODO: Handle this case.
+                          //       break;
+                          //     case TaskState.success:
+                          //       Navigator.push(
+                          //         context,
+                          //         MaterialPageRoute(builder: (context) => MyPdfViewer(filePath)),
+                          //       );
+                          //     // TODO: Handle this case.
+                          //       break;
+                          //     case TaskState.canceled:
+                          //     // TODO: Handle this case.
+                          //       break;
+                          //     case TaskState.error:
+                          //     // TODO: Handle this case.
+                          //       break;
+                          //   }
+                          // });
+
+
+                          // _launchUrl();
+
                         },
                         minWidth: double.infinity,
                         height: 50,
@@ -157,6 +223,8 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 }
+
+
 
 // NOW am going to create trend catagory and recent classes
 class Category {
