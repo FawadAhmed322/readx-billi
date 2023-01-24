@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,7 @@ import 'package:readx/models/Book_model.dart';
 import 'package:readx/trend.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'mypdfviewer.dart';
+import 'package:readx/mypdfviewer.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -24,7 +23,6 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-
   Future<void> _launchUrl() async {
     print(Uri.parse(widget.trend.filename.toString()));
     if (!await launchUrl(Uri.parse(widget.trend.filename.toString()))) {
@@ -41,20 +39,20 @@ class _DetailScreenState extends State<DetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if(widget.trend.image !=null )
-            Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(vertical: 25),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  widget.trend.image!,
-                  width: 175,
-                  height: 267,
+            if (widget.trend.image != null)
+              Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(vertical: 25),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    widget.trend.image!,
+                    width: 175,
+                    height: 267,
+                  ),
                 ),
               ),
-            ),
             SizedBox(height: 25),
             Stack(
               clipBehavior: Clip.none,
@@ -124,11 +122,15 @@ class _DetailScreenState extends State<DetailScreen> {
                       ),
                       SizedBox(height: spacer),
                       MaterialButton(
-                        onPressed: () async {
-
+                        onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => MyPdfViewer(widget.trend.filename.toString())),
+                            MaterialPageRoute(
+                              builder: (context) => MyPdfViewer(
+                                title: widget.trend.name.toString(),
+                                url: widget.trend.filename.toString(),
+                              ),
+                            ),
                           );
 
                           // print(widget.trend.filename.toString());
@@ -159,9 +161,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           //   }
                           // });
 
-
                           // _launchUrl();
-
                         },
                         minWidth: double.infinity,
                         height: 50,
@@ -208,8 +208,6 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 }
-
-
 
 // NOW am going to create trend catagory and recent classes
 class Category {

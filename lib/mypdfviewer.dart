@@ -1,29 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class MyPdfViewer extends StatelessWidget {
-
-  MyPdfViewer(String fileUrl)
-  {
-    this.myPdfUrl = fileUrl;
-  }
-  late WebViewController _controller;
-  var myPdfUrl;
+  const MyPdfViewer({super.key, this.title, this.url});
+  final title;
+  final url;
 
   @override
   Widget build(BuildContext context) {
-    print(myPdfUrl);
-    return Container(
-      child: Center(
-        child: WebView(
-        initialUrl: myPdfUrl,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController)
-        {
-            _controller = webViewController;
-          },
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Container(
+        child: SfPdfViewer.network(
+          url,
         ),
-      )
+      ),
     );
   }
 }
