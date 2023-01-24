@@ -126,24 +126,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       MaterialButton(
                         onPressed: () async {
 
-                          final appDocDir = await getApplicationDocumentsDirectory();
-                          final filePath = "${appDocDir.absolute}/books/${widget.trend.id}.pdf";
-                          final file = File(filePath);
-
-                          print(filePath);
-
-                          final taskId = await FlutterDownloader.enqueue(
-                            url: widget.trend.filename.toString(),
-                            savedDir: filePath,
-                            showNotification: false, // show download progress in status bar (for Android)
-                            openFileFromNotification: false, // click on notification to open downloaded file (for Android)
-                          );
-
-                          print(filePath);
-
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => MyPdfViewer(filePath)),
+                            MaterialPageRoute(builder: (context) => MyPdfViewer(widget.trend.filename.toString())),
                           );
 
                           // print(widget.trend.filename.toString());

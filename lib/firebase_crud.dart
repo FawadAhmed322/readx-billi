@@ -26,7 +26,7 @@ class FirebaseCrud {
       await _dbUsers.child(userId.toString()).get();
 
   Future<List<UserModel>> getAllUsers() async {
-    final users = (await _dbUsers.get()).value;
+    final  users = (await _dbUsers.get()).value;
     if (users is Map) {
       try {
         return users.keys
@@ -67,9 +67,42 @@ class FirebaseCrud {
       await _dbBooks.child(bookId.toString()).get();
 
   Future<List<BookModel>> getAllBooks() async {
-    final books = (await _dbBooks.get()).value;
+    final bookusers = (await _dbBooks.get()).value;
 
     final List<BookModel> bookModels = [];
+
+    // if (bookusers is Map) {
+    //   try {
+    //     print(bookusers.keys.toList());
+    //     bookusers.keys.toList().forEach((key) async {
+    //        var tempbooks = (await _dbBooks.child(key).get()).value;
+    //        if(tempbooks is Map) {
+    //          tempbooks.values.toList().forEach((book) {
+    //            BookModel tempBookModel = new BookModel();
+    //
+    //            tempBookModel.id = book['id'] as int;
+    //            tempBookModel.name = book["name"] as String;
+    //            tempBookModel.writer = book["writer"] as String;
+    //            tempBookModel.image = book["image"] as String;
+    //            tempBookModel.filename = book["filename"] as String;
+    //
+    //            print(tempBookModel.name);
+    //
+    //            bookModels.add(tempBookModel);
+    //          });
+    //        }
+    //     });
+    //     return bookModels;
+    //     // return bookusers.keys
+    //     //     .toList()
+    //     //     .map((e) => BookModel.fromJson(bookusers['$e']))
+    //     //     .toList();
+    //   } catch (e) {
+    //     log('Some Error in parsing users: $e');
+    //     return [];
+    //   }
+    // }
+    // return [];
 
     final databaseReference = FirebaseDatabase.instance.ref("readx").child("books");
     databaseReference.onValue.listen((DatabaseEvent event) {
@@ -84,8 +117,6 @@ class FirebaseCrud {
           tempBookModel.image = book.child("image").value as String;
           tempBookModel.filename = book.child("filename").value as String;
 
-          print(book.child("name").value as String);
-
           bookModels.add(tempBookModel);
         });
       });
@@ -93,19 +124,44 @@ class FirebaseCrud {
 
     return bookModels;
 
-    if (books is Map) {
-      try {
+    // if (books is Map) {
+    //   try {
+    //
+    //     return books.keys
+    //         .toList()
+    //         .map((e) => BookModel.fromJson(books['$e']))
+    //         .toList();
+    //   } catch (e) {
+    //     log('Some Error in parsing books: $e');
+    //     return [];
+    //   }
+    // }
+    // return [];
+  }
 
-        return books.keys
-            .toList()
-            .map((e) => BookModel.fromJson(books['$e']))
-            .toList();
-      } catch (e) {
-        log('Some Error in parsing books: $e');
-        return [];
-      }
-    }
-    return [];
+  List<BookModel> getAllBooksByUser(int userid) {
+    // final books = (await _dbBooks.child(userid.toString()).get()).value;
+
+    final List<BookModel> userBookModels = [];
+
+    final databaseReference = FirebaseDatabase.instance.ref("readx").child("books").child(userid.toString());
+    databaseReference.onValue.listen((DatabaseEvent event) {
+      final books = event.snapshot.children;
+      books.forEach((book) {
+          BookModel tempBookModel = new BookModel();
+
+          tempBookModel.id = book.child('id').value as int;
+          tempBookModel.name = book.child("name").value as String;
+          tempBookModel.writer = book.child("writer").value as String;
+          tempBookModel.image = book.child("image").value as String;
+          tempBookModel.filename = book.child("filename").value as String;
+
+          userBookModels.add(tempBookModel);
+        });
+    });
+
+    return userBookModels;
+
   }
 
   Future updateBook(BookModel book) async {

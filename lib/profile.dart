@@ -1,8 +1,12 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readx/book_upload.dart';
 import 'package:readx/controllers/user_controller.dart';
+import 'package:readx/main.dart';
+import 'package:readx/models/Book_model.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:readx/firebase_crud.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -12,6 +16,44 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool _isOpen = false;
   PanelController _panelController = PanelController();
+
+  late final userController;
+
+  late List<BookModel> bookModel;
+
+  void initState(){
+    userController = Get.find<UserController>();
+    getAllBooksByUserListner();
+    // bookModel = getIt<FirebaseCrud>().getAllBooksByUser(userController.loggedInUser?.id);
+  }
+
+  void getAllBooksByUserListner() {
+
+    List<BookModel> bookModels = [];
+
+    final databaseReference = FirebaseDatabase.instance.ref("readx").child("books").child(userController.loggedInUser!.id!.toString());
+    databaseReference.onValue.listen((DatabaseEvent event) {
+      final booksevent = event.snapshot.children;
+      booksevent.forEach((book) {
+          BookModel tempBookModel = new BookModel();
+          tempBookModel.id = book.child('id').value as int;
+          tempBookModel.name = book.child("name").value as String;
+          tempBookModel.writer = book.child("writer").value as String;
+          tempBookModel.image = book.child("image").value as String;
+          tempBookModel.filename = book.child("filename").value as String;
+
+          print("Value");
+          print(book.child("name").value as String);
+
+          bookModels.add(tempBookModel);
+        });
+      });
+      setState(() {
+        print("State in bracket");
+        bookModel = bookModels;
+        print(bookModel);
+      });
+  }
 
   // ignore: prefer_final_fields
   var _imageList = [
@@ -40,7 +82,10 @@ class _ProfilePageState extends State<ProfilePage> {
   /// **********************************************
   @override
   Widget build(BuildContext context) {
-    final userController = Get.find<UserController>();
+    // final userController = Get.find<UserController>();
+    //
+    // BookModel bookModel = getIt<FirebaseCrud>().getAllBooksByUser(userController.)
+
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
           foregroundColor: Colors.cyanAccent,
@@ -151,7 +196,7 @@ class _ProfilePageState extends State<ProfilePage> {
             primary: false,
             shrinkWrap: true,
             padding: EdgeInsets.zero,
-            itemCount: _imageList.length,
+            itemCount: bookModel.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               mainAxisSpacing: 16,
@@ -159,7 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
             itemBuilder: (BuildContext context, int index) => Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(_imageList[index]),
+                  image: NetworkImage(bookModel[index].image.toString()),
                   fit: BoxFit.cover,
                 ),
               ),

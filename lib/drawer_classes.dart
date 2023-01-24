@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -27,21 +28,49 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   void initState() {
-    getAllBooks();
+    // getAllBooks();
+    getAllBooksListener();
     // addDummyData();
     super.initState();
+  }
+
+  void getAllBooksListener() {
+
+    List<BookModel> bookModels = [];
+
+    final databaseReference = FirebaseDatabase.instance.ref("readx").child("books");
+    databaseReference.onValue.listen((DatabaseEvent event) {
+      final booksevent = event.snapshot.children;
+      print("Bookevent");
+      print(booksevent);
+      print("Bookevent");
+      booksevent.forEach((user) {
+        user.children.forEach((book) {
+          BookModel tempBookModel = new BookModel();
+          tempBookModel.id = book.child('id').value as int;
+          tempBookModel.name = book.child("name").value as String;
+          tempBookModel.writer = book.child("writer").value as String;
+          tempBookModel.image = book.child("image").value as String;
+          tempBookModel.filename = book.child("filename").value as String;
+
+          print("Value");
+          print(book.child("name").value as String);
+
+          bookModels.add(tempBookModel);
+        });
+      });
+      setState(() {
+        print("State in bracket");
+        books = bookModels;
+        print(books);
+      });
+    });
   }
 
   Future getAllBooks() async {
     // books.addAll(await getIt<FirebaseCrud>().getAllBooks());
 
     books = await getIt<FirebaseCrud>().getAllBooks();
-
-    print(books);
-    books.forEach((book) {
-      print(book.name);
-      print('xddd');
-    });
     // for (int i = 0; i < books.length; i++) {
     //   // categories.addAll(books[i].genre ?? []);
     // }
