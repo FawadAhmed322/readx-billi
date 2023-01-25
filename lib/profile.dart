@@ -1,12 +1,19 @@
+import 'dart:io';
+
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readx/book_upload.dart';
 import 'package:readx/controllers/user_controller.dart';
+import 'package:readx/detail_screenforuserbooks.dart';
 import 'package:readx/main.dart';
 import 'package:readx/models/Book_model.dart';
+import 'package:readx/proportinate.dart';
+import 'package:readx/utils/toast_util.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:readx/firebase_crud.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -20,6 +27,8 @@ class _ProfilePageState extends State<ProfilePage> {
   late final userController;
 
   late List<BookModel> bookModel;
+
+  String? profilePic;
 
   void initState(){
     userController = Get.find<UserController>();
@@ -167,6 +176,32 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<String?> imagePicker() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    return image?.path;
+  }
+
+  Future<String> uploadImageToStorage(File imageFile, int userId) async {
+    final reference = FirebaseStorage.instance.ref('users').child('$userId');
+    await reference.putFile(imageFile);
+    //waiting for some more milliseconds to upload the image successfully
+    await Future.delayed(const Duration(milliseconds: 300));
+    return await reference.getDownloadURL();
+  }
+
+  Future<void> updateProfileImageToStorage()
+  async {
+    final uploadedImage = await uploadImageToStorage(
+      File(profilePic!),
+      userController.id!,
+    );
+
+    final databaseRef = FirebaseDatabase.instance.ref().child("users").child(userController.id!);
+    final updatedData = {"image": uploadedImage};
+    databaseRef.update(updatedData);
+  }
+
   /// **********************************************
   /// WIDGETS
   /// **********************************************
@@ -202,6 +237,14 @@ class _ProfilePageState extends State<ProfilePage> {
               mainAxisSpacing: 16,
             ),
             itemBuilder: (BuildContext context, int index) => Container(
+              child: GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => DetailUserBooksScreen(trend: bookModel[index], userid: userController.loggedInUser!.id!.toString())),
+                  );
+                }
+              ),
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(bookModel[index].image.toString()),
@@ -270,21 +313,22 @@ class _ProfilePageState extends State<ProfilePage> {
   /// Info Section
   Row _infoSection() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        _infoCell(title: 'Total Books Uploaded', value: '6'),
+        _infoCell(title: 'Total Books Uploaded', value: bookModel.length.toString()),
         Container(
           width: 1,
           height: 40,
           color: Colors.grey,
         ),
-        _infoCell(title: 'price per Book', value: "\$14"),
-        Container(
-          width: 1,
-          height: 40,
-          color: Colors.grey,
-        ),
-        _infoCell(title: 'Location', value: 'Jhelum'),
+        // _infoCell(title: 'price per Book', value: "\$14"),
+        // Container(
+        //   width: 1,
+        //   height: 40,
+        //   color: Colors.grey,
+        // ),
+        // _infoCell(title: 'Location', value: 'Jhelum'),
       ],
     );
   }
@@ -340,6 +384,14 @@ class _ProfilePageState extends State<ProfilePage> {
             fontSize: 16,
           ),
         ),
+        // MaterialButton(
+        //   color: Colors.indigo,
+        //   child: Text("Change Profile Picture", style: TextStyle(
+        //     color: Colors.white,
+        //   )),
+        //   onPressed: () {
+        //   },
+        // ),
       ],
     );
   }

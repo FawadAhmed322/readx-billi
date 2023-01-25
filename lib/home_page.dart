@@ -361,6 +361,15 @@ class CardRecent extends StatelessWidget {
                     color: blackColor,
                   ),
                 ),
+                Text(
+                  book.writer ?? '',
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: blackColor,
+                  ),
+                ),
                 // CircularPercentIndicator(
                 //   radius: 50,
                 //   lineWidth: 6,
@@ -369,15 +378,15 @@ class CardRecent extends StatelessWidget {
                 //   progressColor: greenColor,
                 //   reverse: true,
                 // ),
-                Text(
-                  // "${book.percent}% Completed",
-                  "50% Completed",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: greyColor500,
-                  ),
-                ),
+                // Text(
+                //   // "${book.percent}% Completed",
+                //   "50% Completed",
+                //   style: TextStyle(
+                //     fontWeight: FontWeight.w500,
+                //     fontSize: 12,
+                //     color: greyColor500,
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -578,7 +587,7 @@ class HeaderDetail extends StatelessWidget {
         ),
         Spacer(),
         Text(
-          "Free Access",
+          "",
           style: TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 14,

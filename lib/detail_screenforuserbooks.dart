@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,19 +12,23 @@ import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:readx/mypdfviewer.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
-class DetailScreen extends StatefulWidget {
-  const DetailScreen({
+class DetailUserBooksScreen extends StatefulWidget {
+
+  const DetailUserBooksScreen({
     Key? key,
     required this.trend,
+    required this.userid,
   }) : super(key: key);
 
   final BookModel trend;
 
+  final String userid;
+
   @override
-  _DetailScreenState createState() => _DetailScreenState();
+  _DetailUserBooksScreenState createState() => _DetailUserBooksScreenState();
 }
 
-class _DetailScreenState extends State<DetailScreen> {
+class _DetailUserBooksScreenState extends State<DetailUserBooksScreen> {
   Future<void> _launchUrl() async {
     print(Uri.parse(widget.trend.filename.toString()));
     if (!await launchUrl(Uri.parse(widget.trend.filename.toString()))) {
@@ -95,7 +100,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         width: double.infinity,
                         height: 60,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(6),
                           color: greyColor100,
@@ -183,25 +188,51 @@ class _DetailScreenState extends State<DetailScreen> {
                     ],
                   ),
                 ),
-                // Positioned(
-                //   top: -25,
-                //   right: 30,
-                //   child: MaterialButton(
-                //     onPressed: () {
-                //     },
-                //     minWidth: 50,
-                //     height: 50,
-                //     color: greenColor,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(100),
-                //     ),
-                //     padding: EdgeInsets.all(18),
-                //     child: Icon(
-                //       Icons.bookmark,
-                //       color: whiteColor,
-                //     ),
-                //   ),
-                // )
+                Positioned(
+                  top: -25,
+                  right: 30,
+                  child: MaterialButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("Delete Book"),
+                            content: Text("Do you want to delete this book?"),
+                            actions: <Widget>[
+                              MaterialButton(
+                                child: Text("No"),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              MaterialButton(
+                                child: Text("Yes"),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  FirebaseDatabase.instance.ref('readx').child("books").child(widget.userid).child(widget.trend.id.toString()).remove();
+                                  showToast(widget.trend.name.toString() + "has been removed!");
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    minWidth: 50,
+                    height: 50,
+                    color: greenColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    padding: EdgeInsets.all(18),
+                    child: Icon(
+                      Icons.delete,
+                      color: whiteColor,
+                    ),
+                  ),
+                )
               ],
             )
           ],
@@ -257,4 +288,3 @@ class Trend {
 //   Trend(image: "assets/big0764119982.jpg", title: "Calculus", creator: "Michael Spivak."),
 //   Trend(image: "assets/AI-World.webp", title: "Artificial intelligence ", creator: " Dr. Lee "),
 // ];
-
