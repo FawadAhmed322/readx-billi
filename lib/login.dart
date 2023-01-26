@@ -16,7 +16,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final emailController =
         TextEditingController(text: 'musaddiq101@gmail.com');
-    final passwordController = TextEditingController(text: 'Test@123');
+    final passwordController = TextEditingController(text: 'Test@1234');
     final formKey = GlobalKey<FormState>();
     return Scaffold(
       body: SingleChildScrollView(

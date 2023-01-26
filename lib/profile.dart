@@ -5,8 +5,11 @@ import 'package:readx/book_upload.dart';
 import 'package:readx/controllers/user_controller.dart';
 import 'package:readx/main.dart';
 import 'package:readx/models/Book_model.dart';
+import 'package:readx/utils/toast_util.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:readx/firebase_crud.dart';
+
+import 'edit_profile.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -21,38 +24,40 @@ class _ProfilePageState extends State<ProfilePage> {
 
   late List<BookModel> bookModel;
 
-  void initState(){
+  void initState() {
     userController = Get.find<UserController>();
     getAllBooksByUserListner();
     // bookModel = getIt<FirebaseCrud>().getAllBooksByUser(userController.loggedInUser?.id);
   }
 
   void getAllBooksByUserListner() {
-
     List<BookModel> bookModels = [];
 
-    final databaseReference = FirebaseDatabase.instance.ref("readx").child("books").child(userController.loggedInUser!.id!.toString());
+    final databaseReference = FirebaseDatabase.instance
+        .ref("readx")
+        .child("books")
+        .child(userController.loggedInUser!.id!.toString());
     databaseReference.onValue.listen((DatabaseEvent event) {
       final booksevent = event.snapshot.children;
       booksevent.forEach((book) {
-          BookModel tempBookModel = new BookModel();
-          tempBookModel.id = book.child('id').value as int;
-          tempBookModel.name = book.child("name").value as String;
-          tempBookModel.writer = book.child("writer").value as String;
-          tempBookModel.image = book.child("image").value as String;
-          tempBookModel.filename = book.child("filename").value as String;
+        BookModel tempBookModel = new BookModel();
+        tempBookModel.id = book.child('id').value as int;
+        tempBookModel.name = book.child("name").value as String;
+        tempBookModel.writer = book.child("writer").value as String;
+        tempBookModel.image = book.child("image").value as String;
+        tempBookModel.filename = book.child("filename").value as String;
 
-          print("Value");
-          print(book.child("name").value as String);
+        print("Value");
+        print(book.child("name").value as String);
 
-          bookModels.add(tempBookModel);
-        });
+        bookModels.add(tempBookModel);
       });
-      setState(() {
-        print("State in bracket");
-        bookModel = bookModels;
-        print(bookModel);
-      });
+    });
+    setState(() {
+      print("State in bracket");
+      bookModel = bookModels;
+      print(bookModel);
+    });
   }
 
   // ignore: prefer_final_fields
@@ -94,9 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: const Icon(Icons.add),
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => BookUpload()));
+                context, MaterialPageRoute(builder: (context) => BookUpload()));
           }),
       body: Stack(
         fit: StackFit.expand,
@@ -340,6 +343,16 @@ class _ProfilePageState extends State<ProfilePage> {
             fontSize: 16,
           ),
         ),
+        SizedBox(
+          height: 8,
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EditProfile()),
+          ),
+          child: Text('Edit Profile'),
+        )
       ],
     );
   }
