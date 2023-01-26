@@ -10,6 +10,7 @@ import 'package:readx/detail_screenforuserbooks.dart';
 import 'package:readx/main.dart';
 import 'package:readx/models/Book_model.dart';
 import 'package:readx/proportinate.dart';
+import 'package:readx/edit_profile.dart';
 import 'package:readx/utils/toast_util.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:readx/firebase_crud.dart';
@@ -384,6 +385,16 @@ class _ProfilePageState extends State<ProfilePage> {
             fontSize: 16,
           ),
         ),
+        SizedBox(
+          height: 8,
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EditProfile()),
+          ),
+          child: Text('Edit Profile'),
+        )
         // MaterialButton(
         //   color: Colors.indigo,
         //   child: Text("Change Profile Picture", style: TextStyle(
