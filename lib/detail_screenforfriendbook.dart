@@ -13,22 +13,19 @@ import 'package:readx/mypdfviewer.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
 class DetailFriendBooksScreen extends StatefulWidget {
-
   const DetailFriendBooksScreen({
     Key? key,
     required this.trend,
-    required this.userid,
   }) : super(key: key);
 
   final BookModel trend;
 
-  final String userid;
-
   @override
-  _DetailFriendBooksScreenState createState() => _DetailFriendBooksScreenState();
+  _DetailFriendBooksScreenState createState() =>
+      _DetailFriendBooksScreenState();
 }
 
-class _DetailUserBooksScreenState extends State<DetailUserBooksScreen> {
+class _DetailFriendBooksScreenState extends State<DetailFriendBooksScreen> {
   Future<void> _launchUrl() async {
     print(Uri.parse(widget.trend.filename.toString()));
     if (!await launchUrl(Uri.parse(widget.trend.filename.toString()))) {
@@ -100,7 +97,7 @@ class _DetailUserBooksScreenState extends State<DetailUserBooksScreen> {
                         width: double.infinity,
                         height: 60,
                         padding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(6),
                           color: greyColor100,
@@ -188,51 +185,56 @@ class _DetailUserBooksScreenState extends State<DetailUserBooksScreen> {
                     ],
                   ),
                 ),
-                Positioned(
-                  top: -25,
-                  right: 30,
-                  child: MaterialButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text("Delete Book"),
-                            content: Text("Do you want to delete this book?"),
-                            actions: <Widget>[
-                              MaterialButton(
-                                child: Text("No"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              MaterialButton(
-                                child: Text("Yes"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  FirebaseDatabase.instance.ref('readx').child("books").child(widget.userid).child(widget.trend.id.toString()).remove();
-                                  showToast(widget.trend.name.toString() + "has been removed!");
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    minWidth: 50,
-                    height: 50,
-                    color: greenColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    padding: EdgeInsets.all(18),
-                    child: Icon(
-                      Icons.delete,
-                      color: whiteColor,
-                    ),
-                  ),
-                )
+                // Positioned(
+                //   top: -25,
+                //   right: 30,
+                //   child: MaterialButton(
+                //     onPressed: () {
+                //       showDialog(
+                //         context: context,
+                //         builder: (BuildContext context) {
+                //           return AlertDialog(
+                //             title: Text("Delete Book"),
+                //             content: Text("Do you want to delete this book?"),
+                //             actions: <Widget>[
+                //               MaterialButton(
+                //                 child: Text("No"),
+                //                 onPressed: () {
+                //                   Navigator.of(context).pop();
+                //                 },
+                //               ),
+                //               MaterialButton(
+                //                 child: Text("Yes"),
+                //                 onPressed: () {
+                //                   Navigator.of(context).pop();
+                //                   FirebaseDatabase.instance
+                //                       .ref('readx')
+                //                       .child("books")
+                //                       .child(widget.trend.id.toString())
+                //                       .remove();
+                //                   showToast(widget.trend.name.toString() +
+                //                       "has been removed!");
+                //                   Navigator.of(context).pop();
+                //                 },
+                //               ),
+                //             ],
+                //           );
+                //         },
+                //       );
+                //     },
+                //     minWidth: 50,
+                //     height: 50,
+                //     color: greenColor,
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(100),
+                //     ),
+                //     padding: EdgeInsets.all(18),
+                //     child: Icon(
+                //       Icons.delete,
+                //       color: whiteColor,
+                //     ),
+                //   ),
+                // )
               ],
             )
           ],
