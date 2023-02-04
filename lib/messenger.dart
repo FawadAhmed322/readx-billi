@@ -15,26 +15,74 @@ class Messenger extends StatefulWidget {
 class _MessengerState extends State<Messenger> {
   List<UserModel> users = [];
   List<ChatModel> chats = [];
+  List<UserModel> allUsers = [];
   final userController = Get.find<UserController>();
 
   @override
   void initState() {
-    getAllUsers();
+    // getAllUsers();
+    getAllChatUsers();
     // getAllChats();
     super.initState();
   }
 
   Future getAllUsers() async {
     print('my id ${userController.loggedInUser!.id}');
-    final allUsers = await getIt<FirebaseCrud>().getAllUsers();
-    for (int i = 0; i < allUsers.length; i++) {
-      if (allUsers[i].id != userController.loggedInUser!.id &&
-          (allUsers[i].friendIds ?? [])
+    final allFUsers = await getIt<FirebaseCrud>().getAllUsers();
+    for (int i = 0; i < allFUsers.length; i++) {
+      if (allFUsers[i].id != userController.loggedInUser!.id &&
+          (allFUsers[i].friendIds ?? [])
               .contains(userController.loggedInUser!.id)) {
-        users.add(allUsers[i]);
+        // users.add(allUsers[i]);
+        allUsers.add(allFUsers[i]);
       }
     }
     setState(() {});
+  }
+
+  // Future getAllUsers() async {
+  //   print('my id ${userController.loggedInUser!.id}');
+  //   final allUsers = await getIt<FirebaseCrud>().getAllUsers();
+  //   for (int i = 0; i < allUsers.length; i++) {
+  //     if (allUsers[i].id != userController.loggedInUser!.id &&
+  //         (allUsers[i].friendIds ?? [])
+  //             .contains(userController.loggedInUser!.id)) {
+  //       users.add(allUsers[i]);
+  //     }
+  //   }
+  //   setState(() {});
+  // }
+
+  Future getAllChatUsers() async {
+    final allFUsers = await getIt<FirebaseCrud>().getAllUsers();
+    List<UserModel> tempUsers = [];
+    final allChatUsers = await getIt<FirebaseCrud>().getAllChatUsers(userController.loggedInUser!.id);
+    // print(allFUsers.length);
+    // print(allChatUsers.length);
+    // print(allFUsers[0].id);
+    // print(allChatUsers[0]);
+    for(int i = 0; i < allFUsers.length; i++) {
+      for(int j = 0; j < allChatUsers.length;j++) {
+        if(allFUsers[i].id.toString() == allChatUsers[j].toString()) {
+          users.add(allFUsers[i]);
+        }
+      }
+    }
+    // print(users);
+    // for (int i = 0; i < allChatUsers.length; i++) {
+    //   {
+    //     tempUsers.add(allChatUsers[i]);
+    //     // users.add(allChatUsers[i]);
+    //   }
+    // }
+    // print(allChatUsers.length);
+    // allChatUsers.forEach((element) {
+    //   print("xd");
+    //   print(element.id);
+    // });
+    setState(() {
+      // users = allChatUsers;
+    });
   }
 
   // getAllChats() async {
@@ -224,8 +272,26 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
-    getAllChats();
+    // fixAllChat();
+    // getAllChats();
+    getUserChats();
     super.initState();
+  }
+
+  fixAllChat() async {
+    await getIt<FirebaseCrud>().fixChats();
+  }
+
+  getUserChats() async {
+    chats.clear();
+    print(userController.loggedInUser!.id!.toString() + " " + widget.secondUser.id!.toString());
+    final allChats = await getIt<FirebaseCrud>().getAllUsersChats(
+      userController.loggedInUser!.id!,
+      widget.secondUser.id!,
+    );
+    // print(allChats);
+    chats.addAll(allChats);
+    setState(() {});
   }
 
   getAllChats() async {
@@ -424,7 +490,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 timestamp: DateTime.now(),
               ));
               messageController.clear();
-              await getAllChats();
+              await getUserChats();
             },
           ),
         ],
@@ -482,10 +548,11 @@ class _ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           Expanded(
             child: ListView.builder(
-              reverse: true,
+              reverse: false,
               padding: EdgeInsets.all(20),
               itemCount: chats.length,
               itemBuilder: (BuildContext context, int index) {
+                chats.sort((a, b) => a.timestamp.toString().compareTo(b.timestamp.toString()));
                 final ChatModel message = chats[index];
                 final bool isMe =
                     message.sender!.id == userController.loggedInUser!.id;

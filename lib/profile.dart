@@ -76,7 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
         // tempBookModel.writer = book.child("writer").value as String;
         // tempBookModel.image = book.child("image").value as String;
         // tempBookModel.filename = book.child("filename").value as String;
-        BookModel tempBookModel = BookModel.fromJson(book);
+        BookModel tempBookModel = BookModel.fromJson(book.value);
 
         print("Value");
         print(book.child("name").value as String);

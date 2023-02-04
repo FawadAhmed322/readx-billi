@@ -10,6 +10,7 @@ class FirebaseCrud {
   final _dbUsers = FirebaseDatabase.instance.ref('readx').child('users');
   final _dbBooks = FirebaseDatabase.instance.ref('readx').child('books');
   final _dbChats = FirebaseDatabase.instance.ref('readx').child('chats');
+  final _dbMessages = FirebaseDatabase.instance.ref('readx').child('messages');
   final _dbNotes = FirebaseDatabase.instance.ref('readx').child('notes');
 
   ///USERS CRUD
@@ -24,6 +25,29 @@ class FirebaseCrud {
 
   Future getUser(int userId) async =>
       await _dbUsers.child(userId.toString()).get();
+
+  Future<List> getAllChatUsers(int? userid) async {
+    final  users = (await _dbMessages.child(userid.toString()).get()).value;
+    if (users is Map) {
+      try {
+        // print(users);
+        // var a = UserModel.fromJson(users['receiver']);
+        // print(a);
+        // print(users.keys);
+        // return users.keys
+        //     .toList()
+        //     .map((e) => UserModel.fromJson(users['$e']))
+        //     .toList();
+
+        return users.keys.toList();
+
+      } catch (e) {
+        log('Some Error in parsing users: $e');
+        return [];
+      }
+    }
+    return [];
+  }
 
   Future<List<UserModel>> getAllUsers() async {
     final  users = (await _dbUsers.get()).value;
@@ -176,11 +200,53 @@ class FirebaseCrud {
     await _dbBooks.child(bookId.toString()).remove();
   }
 
+  Future fixChats() async {
+    
+    final chats = (await _dbChats.get()).value;
+    if(chats is Map) {
+      var receiver, sender;
+      // chats.keys
+      //     .toList()
+      //     .map((e) => ChatModel.fromJson(chats['$e']))
+      //     .toList().forEach((chat) async {
+      //       receiver = chat.receiver;
+      //       sender = chat.sender;
+      //       print(chat);
+      //       print("Sending...");
+      //       await _dbMessages.child(receiver.id.toString()).child(sender.id.toString()).child(chat.id.toString()).set(chat);
+      //       await _dbMessages.child(sender.id.toString()).child(receiver.id.toString()).child(chat.id.toString()).set(chat);
+      // });
+      chats.values
+          .toList().forEach((chat) async {
+        receiver = chat['receiver'];
+        sender = chat['sender'];
+        print("Sending...");
+        // await _dbMessages.child(receiver['id'].toString()).child(sender['id'].toString()).child(chat['id'].toString()).set(chat);
+        await _dbMessages.child(sender['id'].toString()).child(receiver['id'].toString()).child(chat['id'].toString()).set(chat);
+        // print(chat['id']);
+      });
+    }
+  }
+
   ///CHATS CRUD
   Future addChat(ChatModel chat) async {
+
+    String messageid = DateTime.now().millisecondsSinceEpoch.toString();
+
     try {
-      await _dbChats
-          .child('${DateTime.now().millisecondsSinceEpoch}')
+      String? senderid = chat.sender?.id.toString();
+      String? receiverid = chat.receiver?.id.toString();
+
+      print("object");
+      await _dbMessages
+          .child(senderid!)
+          .child(receiverid!)
+          .child(messageid)
+          .set(chat.toJson());
+      await _dbMessages
+          .child(receiverid!)
+          .child(senderid!)
+          .child(messageid)
           .set(chat.toJson());
       log('Chat Added: ${chat.toJson()}');
     } catch (e) {
@@ -188,8 +254,29 @@ class FirebaseCrud {
     }
   }
 
+  Future<List<ChatModel>> getAllUsersChats(int userId, int receiverid) async {
+    final chats = (await _dbMessages.child(userId.toString()).child(receiverid.toString()).get()).value;
+    if (chats is Map) {
+      try {
+        // print(chats.keys);
+        return chats.keys
+            .toList()
+            .map((e) => ChatModel.fromJson(chats['$e']))
+            .toList()
+            .where((e) => e.sender?.id == userId || e.receiver?.id == userId)
+            .toList();
+      } catch (e) {
+        log('Some Error in getting all chats: $e');
+        return [];
+      }
+    }
+    else{
+      return [];
+    }
+  }
+
   Future<List<ChatModel>> getAllChats(int userId) async {
-    final chats = (await _dbChats.get()).value;
+    final chats = (await _dbChats.child(userId.toString()).get()).value;
     if (chats is Map) {
       try {
         return chats.keys
