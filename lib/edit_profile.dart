@@ -122,17 +122,22 @@ class _EditProfileState extends State<EditProfile> {
                           .ref('readx')
                           .child('users')
                           .child(userController.loggedInUser.id.toString());
-                      await userRef.update({
-                        'name': nameController.text,
-                        'password': passwordController.text
-                      });
                       if (profilePic != null) {
                         final uploadedImage = await uploadImageToStorage(
                           File(profilePic!),
                           newUser.id!,
                         );
+                        await userRef.update({
+                          'name': nameController.text,
+                          'password': passwordController.text,
+                          'image': uploadedImage,
+                        });
                         // newUser = newUser.copyWith(image: uploadedImage);
-                        await userRef.update({'image': uploadedImage});
+                      } else {
+                        await userRef.update({
+                          'name': nameController.text,
+                          'password': passwordController.text
+                        });
                       }
 
                       // await getIt<FirebaseCrud>().updateUser(

@@ -9,6 +9,7 @@ import 'package:readx/controllers/user_controller.dart';
 import 'package:readx/detail_screenforuserbooks.dart';
 import 'package:readx/main.dart';
 import 'package:readx/models/Book_model.dart';
+import 'package:readx/models/user_model.dart';
 import 'package:readx/proportinate.dart';
 import 'package:readx/edit_profile.dart';
 import 'package:readx/utils/toast_util.dart';
@@ -27,42 +28,67 @@ class _ProfilePageState extends State<ProfilePage> {
 
   late final userController;
 
+  var name;
+  var image;
+
   late List<BookModel> bookModel;
 
   String? profilePic;
 
-  void initState(){
+  void initState() {
     userController = Get.find<UserController>();
+    name = userController.loggedInUser!.name;
+    image = userController.loggedInUser!.image;
     getAllBooksByUserListner();
+    userListener();
     // bookModel = getIt<FirebaseCrud>().getAllBooksByUser(userController.loggedInUser?.id);
   }
 
-  void getAllBooksByUserListner() {
+  void userListener() {
+    final userReference = FirebaseDatabase.instance
+        .ref("readx")
+        .child("users")
+        .child(userController.loggedInUser!.id!.toString());
+    userReference.onValue.listen((DatabaseEvent event) {
+      final userEvent = event.snapshot;
 
+      setState(() {
+        userController.loggedInUser = UserModel.fromJson(userEvent.value);
+        name = userEvent.child('name').value.toString();
+        image = userEvent.child('image').value.toString();
+      });
+    });
+  }
+
+  void getAllBooksByUserListner() {
     List<BookModel> bookModels = [];
 
-    final databaseReference = FirebaseDatabase.instance.ref("readx").child("books").child(userController.loggedInUser!.id!.toString());
+    final databaseReference = FirebaseDatabase.instance
+        .ref("readx")
+        .child("books")
+        .child(userController.loggedInUser!.id!.toString());
     databaseReference.onValue.listen((DatabaseEvent event) {
       final booksevent = event.snapshot.children;
       booksevent.forEach((book) {
-          BookModel tempBookModel = new BookModel();
-          tempBookModel.id = book.child('id').value as int;
-          tempBookModel.name = book.child("name").value as String;
-          tempBookModel.writer = book.child("writer").value as String;
-          tempBookModel.image = book.child("image").value as String;
-          tempBookModel.filename = book.child("filename").value as String;
+        // BookModel tempBookModel = BookModel();
+        // tempBookModel.id = book.child('id').value as int;
+        // tempBookModel.name = book.child("name").value as String;
+        // tempBookModel.writer = book.child("writer").value as String;
+        // tempBookModel.image = book.child("image").value as String;
+        // tempBookModel.filename = book.child("filename").value as String;
+        BookModel tempBookModel = BookModel.fromJson(book);
 
-          print("Value");
-          print(book.child("name").value as String);
+        print("Value");
+        print(book.child("name").value as String);
 
-          bookModels.add(tempBookModel);
-        });
+        bookModels.add(tempBookModel);
       });
-      setState(() {
-        print("State in bracket");
-        bookModel = bookModels;
-        print(bookModel);
-      });
+    });
+    setState(() {
+      print("State in bracket");
+      bookModel = bookModels;
+      print(bookModel);
+    });
   }
 
   // ignore: prefer_final_fields
@@ -104,9 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: const Icon(Icons.add),
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => BookUpload()));
+                context, MaterialPageRoute(builder: (context) => BookUpload()));
           }),
       body: Stack(
         fit: StackFit.expand,
@@ -115,11 +139,13 @@ class _ProfilePageState extends State<ProfilePage> {
             alignment: Alignment.topCenter,
             heightFactor: 0.7,
             child: Container(
-              decoration: userController.loggedInUser?.image != null
+              // decoration: userController.loggedInUser?.image != null
+              decoration: image != null
                   ? BoxDecoration(
                       image: DecorationImage(
                         image:
-                            NetworkImage(userController.loggedInUser!.image!),
+                            // NetworkImage(userController.loggedInUser!.image!),
+                            NetworkImage(image),
                         fit: BoxFit.cover,
                       ),
                     )
@@ -191,14 +217,16 @@ class _ProfilePageState extends State<ProfilePage> {
     return await reference.getDownloadURL();
   }
 
-  Future<void> updateProfileImageToStorage()
-  async {
+  Future<void> updateProfileImageToStorage() async {
     final uploadedImage = await uploadImageToStorage(
       File(profilePic!),
       userController.id!,
     );
 
-    final databaseRef = FirebaseDatabase.instance.ref().child("users").child(userController.id!);
+    final databaseRef = FirebaseDatabase.instance
+        .ref()
+        .child("users")
+        .child(userController.id!);
     final updatedData = {"image": uploadedImage};
     databaseRef.update(updatedData);
   }
@@ -238,14 +266,15 @@ class _ProfilePageState extends State<ProfilePage> {
               mainAxisSpacing: 16,
             ),
             itemBuilder: (BuildContext context, int index) => Container(
-              child: GestureDetector(
-                onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => DetailUserBooksScreen(trend: bookModel[index], userid: userController.loggedInUser!.id!.toString())),
-                  );
-                }
-              ),
+              child: GestureDetector(onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => DetailUserBooksScreen(
+                          trend: bookModel[index],
+                          userid: userController.loggedInUser!.id!.toString())),
+                );
+              }),
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(bookModel[index].image.toString()),
@@ -317,7 +346,8 @@ class _ProfilePageState extends State<ProfilePage> {
       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        _infoCell(title: 'Total Books Uploaded', value: bookModel.length.toString()),
+        _infoCell(
+            title: 'Total Books Uploaded', value: bookModel.length.toString()),
         Container(
           width: 1,
           height: 40,
@@ -367,7 +397,8 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       children: <Widget>[
         Text(
-          '${userController.loggedInUser?.name}',
+          // '${userController.loggedInUser?.name}',
+          '${name}',
           style: TextStyle(
             fontFamily: 'NimbusSanL',
             fontWeight: FontWeight.w700,
