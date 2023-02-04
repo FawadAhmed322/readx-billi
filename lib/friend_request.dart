@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readx/controllers/user_controller.dart';
 import 'package:readx/firebase_crud.dart';
+import 'package:readx/friendprofile.dart';
 import 'package:readx/main.dart';
 import 'package:readx/models/user_model.dart';
 import 'package:readx/notification_model.dart';
@@ -66,8 +67,6 @@ class _RequestsWidgetState extends State<RequestsWidget> {
               .contains(userController.loggedInUser!.id)) {
         myFriends.add(allUsers[i]);
       }
-
-
     }
     setState(() {});
   }
@@ -345,82 +344,91 @@ class _RequestsWidgetState extends State<RequestsWidget> {
   }
 
   Widget myFriendWidget(UserModel user) {
-    return Card(
-      margin: const EdgeInsets.fromLTRB(2, 1, 2, 1),
-      elevation: 0.0,
-      color: ThemeColors.blueNotification,
-      child: Container(
-        margin: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (user.image != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(80.0),
-                    child: Image.network(
-                      user.image!,
-                      height: 80,
-                      width: 80,
-                      fit: BoxFit.cover,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => FriendProfilePage(
+                      frienduser: user,
+                    )));
+      },
+      child: new Card(
+        margin: const EdgeInsets.fromLTRB(2, 1, 2, 1),
+        elevation: 0.0,
+        color: ThemeColors.blueNotification,
+        child: Container(
+          margin: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (user.image != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(80.0),
+                      child: Image.network(
+                        user.image!,
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  else
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(80.0),
+                      child: Image.asset(
+                        'assets/user.png',
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  )
-                else
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(80.0),
-                    child: Image.asset(
-                      'assets/user.png',
-                      height: 80,
-                      width: 80,
-                      fit: BoxFit.cover,
-                    ),
+                  const SizedBox(
+                    width: 8,
                   ),
-                const SizedBox(
-                  width: 8,
-                ),
-                Expanded(
-                    child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 25, 0, 2),
-                          child: Text(
-                            user.name ?? '',
-                            style: requestTitle(),
-                            textAlign: TextAlign.start,
-                          ),
-                        )),
-                        // Text(
-                        //   "2d",
-                        //   style: notificationTime(),
-                        //   textAlign: TextAlign.start,
-                        // )
-                      ],
-                    ),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //         child: Padding(
-                    //       padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                    //       child: Text(
-                    //         // item.sMutual
-                    //         '1', style: notificationTime(),
-                    //         textAlign: TextAlign.start,
-                    //       ),
-                    //     ))
-                    //   ],
-                    // ),
-
-                  ],
-                )),
-              ],
-            ),
-            //Row(children: [Expanded(child: Padding(padding: const EdgeInsets.fromLTRB(0, 8, 0, 8), child: Text(item.nBody, style: AppTheme.nbodyText, textAlign: TextAlign.start,),))],)
-          ],
+                  Expanded(
+                      child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 25, 0, 2),
+                            child: Text(
+                              user.name ?? '',
+                              style: requestTitle(),
+                              textAlign: TextAlign.start,
+                            ),
+                          )),
+                          // Text(
+                          //   "2d",
+                          //   style: notificationTime(),
+                          //   textAlign: TextAlign.start,
+                          // )
+                        ],
+                      ),
+                      // Row(
+                      //   children: [
+                      //     Expanded(
+                      //         child: Padding(
+                      //       padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                      //       child: Text(
+                      //         // item.sMutual
+                      //         '1', style: notificationTime(),
+                      //         textAlign: TextAlign.start,
+                      //       ),
+                      //     ))
+                      //   ],
+                      // ),
+                    ],
+                  )),
+                ],
+              ),
+              //Row(children: [Expanded(child: Padding(padding: const EdgeInsets.fromLTRB(0, 8, 0, 8), child: Text(item.nBody, style: AppTheme.nbodyText, textAlign: TextAlign.start,),))],)
+            ],
+          ),
         ),
       ),
     );

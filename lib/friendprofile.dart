@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readx/book_upload.dart';
 import 'package:readx/controllers/user_controller.dart';
+import 'package:readx/detail_screenforhomepage.dart';
 import 'package:readx/detail_screenforuserbooks.dart';
 import 'package:readx/main.dart';
+import 'package:readx/messenger.dart';
 import 'package:readx/models/Book_model.dart';
 import 'package:readx/models/user_model.dart';
 import 'package:readx/proportinate.dart';
@@ -17,12 +19,19 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:readx/firebase_crud.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ProfilePage extends StatefulWidget {
+class FriendProfilePage extends StatefulWidget {
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _FriendProfilePageState createState() => _FriendProfilePageState();
+
+  final UserModel frienduser;
+
+  const FriendProfilePage({
+    Key? key,
+    required this.frienduser,
+  }) : super(key: key);
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _FriendProfilePageState extends State<FriendProfilePage> {
   bool _isOpen = false;
   PanelController _panelController = PanelController();
 
@@ -33,32 +42,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   late List<BookModel> bookModel;
 
-  String? profilePic;
+  late String? profilePic;
 
   void initState() {
-    userController = Get.find<UserController>();
-    name = userController.loggedInUser!.name;
-    image = userController.loggedInUser!.image;
     getAllBooksByUserListner();
     // userListener();
     // bookModel = getIt<FirebaseCrud>().getAllBooksByUser(userController.loggedInUser?.id);
   }
-
-  // void userListener() {
-  //   final userReference = FirebaseDatabase.instance
-  //       .ref("readx")
-  //       .child("users")
-  //       .child(userController.loggedInUser!.id!.toString());
-  //   userReference.onValue.listen((DatabaseEvent event) {
-  //     final userEvent = event.snapshot;
-  //
-  //     setState(() {
-  //       userController.loggedInUser = UserModel.fromJson(userEvent.value);
-  //       name = userEvent.child('name').value.toString();
-  //       image = userEvent.child('image').value.toString();
-  //     });
-  //   });
-  // }
 
   void getAllBooksByUserListner() {
     List<BookModel> bookModels = [];
@@ -66,7 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final databaseReference = FirebaseDatabase.instance
         .ref("readx")
         .child("books")
-        .child(userController.loggedInUser!.id!.toString());
+        .child(widget.frienduser.id.toString());
     databaseReference.onValue.listen((DatabaseEvent event) {
       final booksevent = event.snapshot.children;
       booksevent.forEach((book) {
@@ -91,31 +81,6 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  // ignore: prefer_final_fields
-  var _imageList = [
-    'assets/AI-World.webp',
-    'assets/dsa-book-1-638.webp',
-    'assets/book2.png',
-    'assets/book3.png',
-    'assets/book1.png',
-    'assets/big0764119982.jpg',
-    // 'assets/7.jpeg',
-    // 'assets/8.jpg',
-    // 'assets/9.jpg',
-    // 'assets/10.jpeg',
-    // 'assets/11.png',
-    // 'assets/12.jpeg',
-    // 'assets/13.jpg',
-    'assets/14.jpg',
-    // 'assets/15.jpg',
-    // 'assets/16.jpeg',
-    'assets/17.jpg',
-    'assets/18.jpeg',
-  ];
-
-  /// **********************************************
-  /// LIFE CYCLE METHODS
-  /// **********************************************
   @override
   Widget build(BuildContext context) {
     // final userController = Get.find<UserController>();
@@ -123,15 +88,6 @@ class _ProfilePageState extends State<ProfilePage> {
     // BookModel bookModel = getIt<FirebaseCrud>().getAllBooksByUser(userController.)
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-          foregroundColor: Colors.cyanAccent,
-          backgroundColor: Colors.indigo,
-          label: const Text("Upload  Book"),
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => BookUpload()));
-          }),
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -140,12 +96,12 @@ class _ProfilePageState extends State<ProfilePage> {
             heightFactor: 0.7,
             child: Container(
               // decoration: userController.loggedInUser?.image != null
-              decoration: image != null
+              decoration: widget.frienduser.image != null
                   ? BoxDecoration(
                       image: DecorationImage(
                         image:
                             // NetworkImage(userController.loggedInUser!.image!),
-                            NetworkImage(image),
+                            NetworkImage(widget.frienduser.image.toString()),
                         fit: BoxFit.cover,
                       ),
                     )
@@ -203,38 +159,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<String?> imagePicker() async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
-    return image?.path;
-  }
-
-  Future<String> uploadImageToStorage(File imageFile, int userId) async {
-    final reference = FirebaseStorage.instance.ref('users').child('$userId');
-    await reference.putFile(imageFile);
-    //waiting for some more milliseconds to upload the image successfully
-    await Future.delayed(const Duration(milliseconds: 300));
-    return await reference.getDownloadURL();
-  }
-
-  Future<void> updateProfileImageToStorage() async {
-    final uploadedImage = await uploadImageToStorage(
-      File(profilePic!),
-      userController.id!,
-    );
-
-    final databaseRef = FirebaseDatabase.instance
-        .ref()
-        .child("users")
-        .child(userController.id!);
-    final updatedData = {"image": uploadedImage};
-    databaseRef.update(updatedData);
-  }
-
-  /// **********************************************
-  /// WIDGETS
-  /// **********************************************
-  /// Panel Body
   SingleChildScrollView _panelBody(ScrollController controller) {
     double hPadding = 40;
 
@@ -270,9 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => DetailUserBooksScreen(
-                          trend: bookModel[index],
-                          userid: userController.loggedInUser!.id!.toString())),
+                      builder: (_) => DetailScreen(trend: bookModel[index])),
                 );
               }),
               decoration: BoxDecoration(
@@ -299,7 +221,7 @@ class _ProfilePageState extends State<ProfilePage> {
         //     child: OutlinedButton(
         //       onPressed: () => _panelController.open(),
         //       child: Text(
-        //         '',
+        //         'Follow',
         //         style: TextStyle(
         //           fontFamily: 'NimbusSanL',
         //           fontSize: 12,
@@ -309,33 +231,40 @@ class _ProfilePageState extends State<ProfilePage> {
         //     ),
         //   ),
         // ),
-        // Visibility(
-        //   visible: !_isOpen,
-        //   child: SizedBox(
-        //     width: 16,
-        //   ),
-        // ),
-        // Expanded(
-        //   child: Container(
-        //     alignment: Alignment.center,
-        //     child: SizedBox(
-        //       width: _isOpen
-        //           ? (MediaQuery.of(context).size.width - (2 * hPadding)) / 1.6
-        //           : double.infinity,
-        //       child: OutlinedButton(
-        //         onPressed: () => print('Message tapped'),
-        //         child: Text(
-        //           'MESSAGE',
-        //           style: TextStyle(
-        //             fontFamily: 'NimbusSanL',
-        //             fontSize: 12,
-        //             fontWeight: FontWeight.w700,
-        //           ),
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
+        Visibility(
+          visible: !_isOpen,
+          child: SizedBox(
+            width: 16,
+          ),
+        ),
+        Expanded(
+          child: Container(
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: _isOpen
+                  ? (MediaQuery.of(context).size.width - (2 * hPadding)) / 1.6
+                  : double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => ChatScreen(
+                                secondUser: widget.frienduser,
+                              )));
+                },
+                child: Text(
+                  'MESSAGE',
+                  style: TextStyle(
+                    fontFamily: 'NimbusSanL',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -393,12 +322,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   /// Title Section
   Column _titleSection() {
-    final userController = Get.find<UserController>();
     return Column(
       children: <Widget>[
         Text(
           // '${userController.loggedInUser?.name}',
-          '${name}',
+          '${widget.frienduser.name}',
           style: TextStyle(
             fontFamily: 'NimbusSanL',
             fontWeight: FontWeight.w700,
@@ -416,24 +344,6 @@ class _ProfilePageState extends State<ProfilePage> {
             fontSize: 16,
           ),
         ),
-        SizedBox(
-          height: 8,
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EditProfile()),
-          ),
-          child: Text('Edit Profile'),
-        )
-        // MaterialButton(
-        //   color: Colors.indigo,
-        //   child: Text("Change Profile Picture", style: TextStyle(
-        //     color: Colors.white,
-        //   )),
-        //   onPressed: () {
-        //   },
-        // ),
       ],
     );
   }
