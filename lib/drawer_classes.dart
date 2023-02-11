@@ -35,10 +35,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void getAllBooksListener() {
-
     List<BookModel> bookModels = [];
 
-    final databaseReference = FirebaseDatabase.instance.ref("readx").child("books");
+    final databaseReference =
+        FirebaseDatabase.instance.ref("readx").child("books");
     databaseReference.onValue.listen((DatabaseEvent event) {
       final booksevent = event.snapshot.children;
       print("Bookevent");
@@ -180,8 +180,7 @@ class _DashboardPageState extends State<DashboardPage> {
               backgroundColor: backgroundColor2,
             ),
             TrendingList(
-              trendingBooks:
-                  books.toList(),
+              trendingBooks: books.toList(),
             )
           ],
         ),
@@ -245,7 +244,8 @@ class _UI22State extends State<UI22> {
               ),
               GestureDetector(
                 child: buildCheckItem(
-                    title: "Phone number related", isSelected: isTypeSelected[1]),
+                    title: "Phone number related",
+                    isSelected: isTypeSelected[1]),
                 onTap: () {
                   setState(() {
                     isTypeSelected[1] = !isTypeSelected[1];
@@ -479,7 +479,7 @@ class _NotesPageState extends State<NotesPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       bottomNavigationBar: CustomBottomBar(
-         fetchAllNotes: getUserNotes,
+        fetchAllNotes: getUserNotes,
       ),
       body: SafeArea(
           child: ListView(
@@ -493,9 +493,9 @@ class _NotesPageState extends State<NotesPage> {
 // we are using grid inside column thats why we are facing error
 // use  shrinkWrap and physics widget to solve this error
           Listdata(
-              userId: userController.loggedInUser!.id!,
-              notes: notes,
-              fetchAllUserNotes: getUserNotes,
+            userId: userController.loggedInUser!.id!,
+            notes: notes,
+            fetchAllUserNotes: getUserNotes,
           ),
           // now we craete add list data page
         ],
@@ -617,38 +617,40 @@ class _TranslatorDemoState extends State<TranslatorDemo> {
                     Container(
                         margin: EdgeInsets.only(top: 20),
                         child: DropdownButton<String>(
-                          isExpanded: true,
-                          hint: _dropDownvalue == null
-                              ? Text('Select language')
-                              : Text(_dropDownvalue!,
-                                  style: TextStyle(color: Colors.blue)),
-                          items: <String>[
-                            'English',
-                            'Spanish',
-                            'Chineese',
-                            'German'
-                          ].map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Container(child: Text(value)),
-                            );
-                          }).toList(),
-                          onChanged: (newValue) {
-                            setState(() {
-                              _dropDownvalue = newValue;
-                            });
+                            isExpanded: true,
+                            hint: _dropDownvalue == null
+                                ? Text('Select language')
+                                : Text(_dropDownvalue!,
+                                    style: TextStyle(color: Colors.blue)),
+                            items: <String>[
+                              'English',
+                              'Spanish',
+                              'Chinese',
+                              'German',
+                              'Urdu'
+                            ].map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Container(child: Text(value)),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _dropDownvalue = newValue;
+                              });
 
-                            if (_dropDownvalue == 'English') {
-                              translate_text('en');
-                            } else if (_dropDownvalue == 'Spanish') {
-                              translate_text('es');
-                            } else if (_dropDownvalue == 'Chineese') {
-                              translate_text('zh-cn');
-                            } else if (_dropDownvalue == 'German') {
-                              translate_text('de');
-                            }
-                          },
-                        )),
+                              if (_dropDownvalue == 'English') {
+                                translate_text('en');
+                              } else if (_dropDownvalue == 'Spanish') {
+                                translate_text('es');
+                              } else if (_dropDownvalue == 'Chinese') {
+                                translate_text('zh-cn');
+                              } else if (_dropDownvalue == 'German') {
+                                translate_text('de');
+                              } else if (_dropDownvalue == 'Urdu') {
+                                translate_text('ur');
+                              }
+                            })),
                     Container(
                         margin: EdgeInsets.only(top: 30),
                         child: translated_text != null
@@ -896,7 +898,7 @@ class CustomBottomBar extends StatelessWidget {
               onPressed: () {},
               icon: const Icon(Icons.space_dashboard_rounded)),
           InkWell(
-            onTap: () async{
+            onTap: () async {
               await Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Addtodo()));
               await fetchAllNotes();
@@ -1072,10 +1074,10 @@ class Listdata extends StatelessWidget {
             mainAxisSpacing: 10.0,
           ),
           itemBuilder: (context, index) => ListCard(
-            userId: userId,
+                userId: userId,
                 note: notes[index],
                 press: () {},
-              fetchAllUserNotes: fetchAllUserNotes,
+                fetchAllUserNotes: fetchAllUserNotes,
               )),
     );
   }
@@ -1104,7 +1106,8 @@ class ListCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
+              color:
+                  Colors.primaries[Random().nextInt(Colors.primaries.length)],
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Column(
@@ -1130,7 +1133,7 @@ class ListCard extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: ()async {
+          onTap: () async {
             await getIt<FirebaseCrud>().deleteNote(userId, note.id!);
             await fetchAllUserNotes();
           },
@@ -1138,7 +1141,11 @@ class ListCard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Align(
               alignment: Alignment.topLeft,
-              child: Icon(Icons.delete,size: 25,color: Colors.red,),
+              child: Icon(
+                Icons.delete,
+                size: 25,
+                color: Colors.red,
+              ),
             ),
           ),
         )

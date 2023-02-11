@@ -10,6 +10,9 @@ import 'package:readx/login.dart';
 import 'package:readx/main.dart';
 import 'package:readx/models/Book_model.dart';
 import 'package:image_network/image_network.dart';
+import 'package:readx/utils/toast_util.dart';
+
+import 'booksearchview.dart';
 
 class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   const HomeAppBar({
@@ -214,9 +217,13 @@ enum DrawerSections {
 // search filed
 
 class SearchField extends StatelessWidget {
-  const SearchField({
+  SearchField({
     Key? key,
+    required this.books,
   }) : super(key: key);
+
+  final List<BookModel> books;
+  TextEditingController searchedText = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -224,6 +231,25 @@ class SearchField extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         child: Column(children: [
           TextField(
+            controller: searchedText,
+            onSubmitted: (value) {
+              // showToast(searchedText.text);
+              List<BookModel> similarbooks = books.where((book) {
+                if (book.name == null) {
+                  return false;
+                }
+                return book.name!
+                    .toLowerCase()
+                    .contains(searchedText.text.toLowerCase());
+              }).toList();
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => BooksSearchView(books: similarbooks)));
+              // print(similarbooks);
+              // books.where((book) => book.name.contains(searchedText.text));
+            },
             decoration: InputDecoration(
                 filled: true,
                 fillColor: Color(0xFFe6e6e6),
@@ -262,7 +288,7 @@ class Header extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SearchField(),
+          SearchField(books: books),
           const SectionTitle(
             title: "Discover Latest Books",
             backgroundColor: Color.fromARGB(255, 100, 206, 103),
@@ -310,7 +336,6 @@ class CardRecent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       width: 228,
       height: 165,
@@ -340,58 +365,58 @@ class CardRecent extends StatelessWidget {
           );
         },
         child: Row(
-        children: [
-          Container(
-              child: new ImageNetwork(
-                  image: book.image.toString(), height: 100, width: 100)),
-          // if (book.image != null) Image.network(loadImage().toString()),
-          SizedBox(width: 10),
-          Container(
-            width: 87,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text(
-                  book.name ?? '',
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor,
+          children: [
+            Container(
+                child: new ImageNetwork(
+                    image: book.image.toString(), height: 100, width: 100)),
+            // if (book.image != null) Image.network(loadImage().toString()),
+            SizedBox(width: 10),
+            Container(
+              width: 87,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    book.name ?? '',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: blackColor,
+                    ),
                   ),
-                ),
-                Text(
-                  book.writer ?? '',
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor,
+                  Text(
+                    book.writer ?? '',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: blackColor,
+                    ),
                   ),
-                ),
-                // CircularPercentIndicator(
-                //   radius: 50,
-                //   lineWidth: 6,
-                //   // percent: book.percent.toDouble() / 100,
-                //   percent: 0.5,
-                //   progressColor: greenColor,
-                //   reverse: true,
-                // ),
-                // Text(
-                //   // "${book.percent}% Completed",
-                //   "50% Completed",
-                //   style: TextStyle(
-                //     fontWeight: FontWeight.w500,
-                //     fontSize: 12,
-                //     color: greyColor500,
-                //   ),
-                // ),
-              ],
+                  // CircularPercentIndicator(
+                  //   radius: 50,
+                  //   lineWidth: 6,
+                  //   // percent: book.percent.toDouble() / 100,
+                  //   percent: 0.5,
+                  //   progressColor: greenColor,
+                  //   reverse: true,
+                  // ),
+                  // Text(
+                  //   // "${book.percent}% Completed",
+                  //   "50% Completed",
+                  //   style: TextStyle(
+                  //     fontWeight: FontWeight.w500,
+                  //     fontSize: 12,
+                  //     color: greyColor500,
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -434,7 +459,6 @@ class TrendingList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     trendingBooks.shuffle();
 
     return SingleChildScrollView(
